@@ -17,16 +17,16 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   };
 
   return (
-    <div className={`animate-spin rounded-full border-2 border-warm-200 border-t-warm-500 ${sizeClasses[size]} ${className}`} />
+    <div className={`animate-spin rounded-full border-2 border-muted border-t-primary ${sizeClasses[size]} ${className}`} />
   );
 };
 
 export const PageLoader: React.FC = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-beige-50">
+    <div className="min-h-screen flex items-center justify-center bg-background">
       <div className="text-center">
         <LoadingSpinner size="lg" className="mx-auto mb-4" />
-        <p className="text-warm-600">Loading...</p>
+        <p className="text-muted-foreground">Loading...</p>
       </div>
     </div>
   );
