@@ -43,7 +43,7 @@
   }
 
   body {
-    @apply bg-background text-foreground font-system-ui antialiased;
+    @apply bg-background text-foreground antialiased;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   }
 }
