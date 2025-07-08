@@ -1,186 +1,140 @@
 
-import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Plus, Users, DollarSign, Calendar } from 'lucide-react';
-import { Layout } from '../components/common/Layout';
-import { LoadingSpinner } from '../components/common/LoadingSpinner';
-import { api } from '../services/api';
-import { toast } from 'sonner';
+import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { Plus, Users, DollarSign, Activity, TrendingUp, Terminal } from 'lucide-react';
 
-interface Group {
-  _id: string;
-  name: string;
-  members: Array<{
-    _id: string;
-    name: string;
-    email: string;
-  }>;
-  createdAt: string;
-}
-
-export const DashboardPage: React.FC = () => {
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [loading, setLoading] = useState(true);
+const DashboardPage: React.FC = () => {
   const { user } = useAuth();
 
-  useEffect(() => {
-    fetchGroups();
-  }, []);
+  const stats = [
+    { label: 'active groups', value: '3', cmd: 'ps aux | grep group', icon: Users, color: 'text-primary' },
+    { label: 'total expenses', value: '$1,247.50', cmd: 'sum expenses.log', icon: DollarSign, color: 'text-accent' },
+    { label: 'pending splits', value: '7', cmd: 'wc -l pending.txt', icon: Activity, color: 'text-yellow-400' },
+    { label: 'saved this month', value: '$234.80', cmd: 'grep -c "saved" month.log', icon: TrendingUp, color: 'text-green-400' },
+  ];
 
-  const fetchGroups = async () => {
-    try {
-      const response = await api.get('/groups');
-      setGroups(response.data);
-    } catch (error) {
-      toast.error('Failed to fetch groups');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (loading) {
-    return (
-      <Layout>
-        <div className="flex items-center justify-center min-h-screen">
-          <LoadingSpinner size="lg" />
-        </div>
-      </Layout>
-    );
-  }
+  const recentActivity = [
+    { action: 'Created group "Weekend Trip"', time: '2 hours ago', cmd: 'mkdir weekend_trip' },
+    { action: 'Added expense: Dinner $85.00', time: '1 day ago', cmd: 'echo "dinner: 85.00" >> expenses.log' },
+    { action: 'Split payment with John', time: '2 days ago', cmd: 'split -u john payment.txt' },
+    { action: 'Joined group "Office Lunch"', time: '3 days ago', cmd: 'join office_lunch' },
+  ];
 
   return (
-    <Layout>
-      <div className="p-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-warm-800 mb-2">
-            Welcome back, {user?.name}!
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-primary glow-text mb-2">
+            Dashboard
           </h1>
-          <p className="text-warm-600">
-            Manage your groups and track shared expenses
+          <p className="text-accent font-mono">
+            <span className="text-primary">➜</span> welcome back, {user?.name}
           </p>
         </div>
+        <button className="terminal-button flex items-center space-x-2">
+          <Plus className="w-4 h-4" />
+          <span>new group</span>
+        </button>
+      </div>
 
-        {/* Quick Stats */}
-        <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-mac">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-warm-100 rounded-lg flex items-center justify-center mr-4">
-                <Users className="w-6 h-6 text-warm-500" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {stats.map((stat, index) => (
+          <div key={index} className="terminal-card">
+            <div className="flex items-center justify-between mb-3">
+              <stat.icon className={`w-6 h-6 ${stat.color}`} />
+              <Terminal className="w-4 h-4 text-muted-foreground" />
+            </div>
+            <div className="space-y-1">
+              <div className="text-2xl font-bold text-primary">
+                {stat.value}
               </div>
-              <div>
-                <p className="text-2xl font-bold text-warm-800">{groups.length}</p>
-                <p className="text-warm-600">Active Groups</p>
+              <div className="text-sm text-muted-foreground font-mono">
+                {stat.label}
+              </div>
+              <div className="text-xs text-accent font-mono">
+                $ {stat.cmd}
               </div>
             </div>
           </div>
-          
-          <div className="bg-white rounded-xl p-6 shadow-mac">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                <DollarSign className="w-6 h-6 text-green-500" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-warm-800">$0.00</p>
-                <p className="text-warm-600">You Owe</p>
-              </div>
-            </div>
+        ))}
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="terminal-card">
+          <div className="flex items-center space-x-2 mb-4">
+            <Activity className="w-5 h-5 text-primary" />
+            <h2 className="text-xl font-bold text-primary">Recent Activity</h2>
           </div>
-          
-          <div className="bg-white rounded-xl p-6 shadow-mac">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                <DollarSign className="w-6 h-6 text-blue-500" />
+          <div className="space-y-3">
+            {recentActivity.map((activity, index) => (
+              <div key={index} className="flex items-start space-x-3 p-3 rounded-lg hover:bg-primary/5 transition-colors">
+                <div className="w-2 h-2 bg-primary rounded-full mt-2 flex-shrink-0"></div>
+                <div className="flex-1">
+                  <div className="text-sm text-foreground mb-1">
+                    {activity.action}
+                  </div>
+                  <div className="text-xs text-muted-foreground font-mono">
+                    {activity.time}
+                  </div>
+                  <div className="text-xs text-accent font-mono">
+                    $ {activity.cmd}
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="text-2xl font-bold text-warm-800">$0.00</p>
-                <p className="text-warm-600">You're Owed</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
 
-        {/* Groups Section */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-warm-800">Your Groups</h2>
-            <Link
-              to="/create-group"
-              className="flex items-center space-x-2 px-4 py-2 bg-warm-500 text-white rounded-lg hover:bg-warm-600 transition-all duration-200 shadow-mac hover:shadow-mac-hover"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Create Group</span>
-            </Link>
+        <div className="terminal-card">
+          <div className="flex items-center space-x-2 mb-4">
+            <Users className="w-5 h-5 text-primary" />
+            <h2 className="text-xl font-bold text-primary">Active Groups</h2>
           </div>
-
-          {groups.length === 0 ? (
-            <div className="text-center py-12">
-              <div className="w-16 h-16 bg-beige-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Users className="w-8 h-8 text-beige-400" />
+          <div className="space-y-3">
+            {['Weekend Trip', 'Office Lunch', 'Roommate Expenses'].map((group, index) => (
+              <div key={index} className="flex items-center justify-between p-3 rounded-lg hover:bg-primary/5 transition-colors">
+                <div className="flex items-center space-x-3">
+                  <div className="w-10 h-10 bg-primary/20 rounded-lg flex items-center justify-center">
+                    <span className="text-primary font-mono font-bold">
+                      {group.charAt(0)}
+                    </span>
+                  </div>
+                  <div>
+                    <div className="text-sm font-medium text-foreground">
+                      {group}
+                    </div>
+                    <div className="text-xs text-muted-foreground font-mono">
+                      {3 + index} members
+                    </div>
+                  </div>
+                </div>
+                <button className="text-primary hover:text-accent transition-colors">
+                  <ArrowRight className="w-4 h-4" />
+                </button>
               </div>
-              <h3 className="text-xl font-semibold text-warm-800 mb-2">No groups yet</h3>
-              <p className="text-warm-600 mb-6">
-                Create your first group to start splitting expenses with friends
-              </p>
-              <Link
-                to="/create-group"
-                className="inline-flex items-center space-x-2 px-6 py-3 bg-warm-500 text-white rounded-lg hover:bg-warm-600 transition-all duration-200 shadow-mac hover:shadow-mac-hover"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Create Your First Group</span>
-              </Link>
-            </div>
-          ) : (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {groups.map((group) => (
-                <Link
-                  key={group._id}
-                  to={`/groups/${group._id}`}
-                  className="bg-white rounded-xl p-6 shadow-mac hover:shadow-mac-hover transition-all duration-200 hover:scale-105"
-                >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="w-12 h-12 bg-warm-100 rounded-lg flex items-center justify-center">
-                      <Users className="w-6 h-6 text-warm-500" />
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-warm-600">
-                        {group.members.length} member{group.members.length !== 1 ? 's' : ''}
-                      </p>
-                    </div>
-                  </div>
-                  
-                  <h3 className="text-lg font-semibold text-warm-800 mb-2">
-                    {group.name}
-                  </h3>
-                  
-                  <div className="flex items-center text-sm text-warm-600 mb-4">
-                    <Calendar className="w-4 h-4 mr-1" />
-                    <span>Created {new Date(group.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  
-                  <div className="flex -space-x-2">
-                    {group.members.slice(0, 4).map((member, index) => (
-                      <div
-                        key={member._id}
-                        className="w-8 h-8 bg-warm-500 rounded-full flex items-center justify-center text-white text-sm font-medium border-2 border-white"
-                        title={member.name}
-                      >
-                        {member.name.charAt(0).toUpperCase()}
-                      </div>
-                    ))}
-                    {group.members.length > 4 && (
-                      <div className="w-8 h-8 bg-beige-200 rounded-full flex items-center justify-center text-warm-600 text-sm font-medium border-2 border-white">
-                        +{group.members.length - 4}
-                      </div>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
-          )}
+            ))}
+          </div>
         </div>
       </div>
-    </Layout>
+
+      <div className="terminal-card">
+        <div className="flex items-center space-x-2 mb-4">
+          <Terminal className="w-5 h-5 text-primary" />
+          <h2 className="text-xl font-bold text-primary">System Log</h2>
+        </div>
+        <div className="bg-black/60 rounded-lg p-4 font-mono text-sm">
+          <div className="text-primary mb-1">[INFO] User authenticated successfully</div>
+          <div className="text-accent mb-1">[DEBUG] Loading dashboard components...</div>
+          <div className="text-green-400 mb-1">[SUCCESS] Dashboard loaded in 0.045s</div>
+          <div className="text-yellow-400 mb-1">[WARN] 2 pending notifications</div>
+          <div className="text-primary">
+            <span className="text-accent">user@splitgroup:~$</span>
+            <span className="animate-pulse">_</span>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 };
+
+export default DashboardPage;

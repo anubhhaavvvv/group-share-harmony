@@ -1,150 +1,140 @@
 
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Users, Sparkles } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { toast } from 'sonner';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
+import { Terminal, Lock, User, ArrowRight } from 'lucide-react';
 
-export const LoginPage: React.FC = () => {
+const LoginPage: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  
+  const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!email || !password) {
-      toast.error('Please fill in all fields');
-      return;
-    }
+    setIsLoading(true);
 
-    setLoading(true);
     try {
       await login(email, password);
-      toast.success('Welcome back!');
       navigate('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  const fillTestCredentials = () => {
+  const handleTestLogin = () => {
     setEmail('test@splitgroup.com');
     setPassword('password123');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-muted/20 to-background flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-primary/5 rounded-full blur-3xl"></div>
-      </div>
-
-      <div className="w-full max-w-md z-10">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-glow animate-pulse-glow">
-            <Users className="w-8 h-8 text-white" />
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-black via-gray-900 to-black relative">
+      <div className="scanline pointer-events-none" />
+      
+      <div className="terminal-window w-full max-w-md mx-4">
+        <div className="terminal-header">
+          <div className="terminal-controls">
+            <div className="terminal-dot terminal-dot-red"></div>
+            <div className="terminal-dot terminal-dot-yellow"></div>
+            <div className="terminal-dot terminal-dot-green"></div>
           </div>
-          <h1 className="text-3xl font-bold text-foreground mb-2">Welcome Back</h1>
-          <p className="text-muted-foreground">Sign in to your SplitGroup account</p>
+          <div className="terminal-text text-sm">
+            auth.splitgroup.com
+          </div>
+          <div className="w-16"></div>
         </div>
 
-        {/* Login Form */}
-        <div className="mac-window p-8">
-          {/* Test Credentials Banner */}
-          <div className="mb-6 p-4 bg-primary/10 border border-primary/20 rounded-xl">
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Test Account</span>
+        <div className="p-8">
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
+              <Terminal className="w-8 h-8 text-black" />
             </div>
-            <p className="text-xs text-muted-foreground mb-3">Use these credentials to preview the app:</p>
+            <h1 className="text-2xl font-bold text-primary glow-text mb-2">
+              SplitGroup Terminal
+            </h1>
+            <p className="text-accent font-mono text-sm">
+              Authentication required
+            </p>
+          </div>
+
+          <div className="mb-6 p-4 bg-primary/10 rounded-lg border border-primary/20">
+            <div className="text-primary font-mono text-sm mb-2">
+              <span className="text-accent">➜</span> test credentials
+            </div>
+            <div className="text-xs text-muted-foreground font-mono mb-2">
+              email: test@splitgroup.com
+            </div>
+            <div className="text-xs text-muted-foreground font-mono mb-3">
+              password: password123
+            </div>
             <button
-              type="button"
-              onClick={fillTestCredentials}
-              className="text-xs bg-primary/20 hover:bg-primary/30 px-3 py-1 rounded-lg transition-colors text-primary font-medium"
+              onClick={handleTestLogin}
+              className="terminal-button text-xs w-full"
             >
-              Fill Test Credentials
+              Load test credentials
             </button>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-foreground mb-2">
-                Email Address
+              <label className="block text-primary font-mono text-sm mb-2">
+                <User className="w-4 h-4 inline mr-2" />
+                email
               </label>
               <input
                 type="email"
-                id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full px-4 py-3 mac-input rounded-xl focus:outline-none"
-                placeholder="Enter your email"
-                disabled={loading}
+                className="terminal-input w-full"
+                placeholder="user@domain.com"
+                required
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-foreground mb-2">
-                Password
+              <label className="block text-primary font-mono text-sm mb-2">
+                <Lock className="w-4 h-4 inline mr-2" />
+                password
               </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? 'text' : 'password'}
-                  id="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-3 pr-12 mac-input rounded-xl focus:outline-none"
-                  placeholder="Enter your password"
-                  disabled={loading}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
-                  disabled={loading}
-                >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="terminal-input w-full"
+                placeholder="••••••••"
+                required
+              />
             </div>
 
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-3 mac-button rounded-xl text-foreground font-semibold transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+              disabled={isLoading}
+              className="terminal-button w-full h-12 flex items-center justify-center space-x-2"
             >
-              {loading ? (
-                <>
-                  <LoadingSpinner size="sm" className="mr-2" />
-                  Signing in...
-                </>
+              {isLoading ? (
+                <LoadingSpinner size="sm" />
               ) : (
-                'Sign In'
+                <>
+                  <span>authenticate</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
               )}
             </button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-muted-foreground">
-              Don't have an account?{' '}
-              <Link to="/register" className="text-primary hover:text-primary/80 font-medium transition-colors">
-                Sign up here
-              </Link>
-            </p>
-          </div>
-
-          <div className="mt-4 text-center">
-            <Link to="/" className="text-primary hover:text-primary/80 font-medium transition-colors">
-              ← Back to Home
+          <div className="mt-8 text-center">
+            <div className="text-muted-foreground font-mono text-sm mb-2">
+              <span className="text-accent">➜</span> new user?
+            </div>
+            <Link
+              to="/register"
+              className="text-primary hover:text-accent transition-colors font-mono text-sm underline"
+            >
+              create account
             </Link>
           </div>
         </div>
@@ -152,3 +142,5 @@ export const LoginPage: React.FC = () => {
     </div>
   );
 };
+
+export default LoginPage;
