@@ -9,9 +9,9 @@ import { ProtectedRoute } from "./components/auth/ProtectedRoute";
 
 // Pages
 import { LandingPage } from "./pages/LandingPage";
-import { LoginPage } from "./pages/LoginPage";
+import LoginPage from "./pages/LoginPage";
 import { RegisterPage } from "./pages/RegisterPage";
-import { DashboardPage } from "./pages/DashboardPage";
+import DashboardPage from "./pages/DashboardPage";
 import { CreateGroupPage } from "./pages/CreateGroupPage";
 import { GroupDetailsPage } from "./pages/GroupDetailsPage";
 import { ProfilePage } from "./pages/ProfilePage";

@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { useAuth } from '../contexts/AuthContext';
-import { Plus, Users, DollarSign, Activity, TrendingUp, Terminal } from 'lucide-react';
+import { Plus, Users, DollarSign, Activity, TrendingUp, Terminal, ArrowRight } from 'lucide-react';
 
 const DashboardPage: React.FC = () => {
   const { user } = useAuth();
